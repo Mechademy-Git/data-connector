@@ -4,6 +4,7 @@ from app.models import RequestTimeRange, AsyncTaskResult
 from celery.result import AsyncResult
 from .tasks import fetch_data
 
+
 app = FastAPI()
 
 
@@ -17,7 +18,7 @@ async def raise_request(time_range: RequestTimeRange, _: str = Depends(api_key_a
 
 
 @app.get("/tasks/{task_id}")
-def get_task_status(task_id: str):
+def get_task_status(task_id: str, _: str = Depends(api_key_auth)):
     task = AsyncResult(task_id)
     if task.state == "PENDING":
         response = {
