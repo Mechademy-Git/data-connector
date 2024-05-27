@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     post_data_endpoint: str = "http://turbomechanica.ai/api/data"
     post_data_api_key: str = "turbomechanica_api_key"
 
+    class Config:
+        env_file = ".env"
+
 
 def get_settings() -> Settings:
     return Settings()
