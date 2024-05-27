@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "mechademy-data-connector"
+version = "0.1.0"
+description = ""
+authors = ["Rajdeep Sharma"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+celery = {extras = ["redis"], version = "^5.2.0"}
+fastapi = "^0.111.0"
+uvicorn = "^0.29.0"
+pydantic-settings = "^2.2.1"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
