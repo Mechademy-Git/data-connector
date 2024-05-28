@@ -14,7 +14,7 @@ services:
 
   celery:
     build: .
-    command: poetry run celery -A app.celery.celery worker --loglevel=info
+    command: poetry run celery -A src.celery.celery worker --loglevel=info
     env_file:
       - .env
     depends_on:
@@ -22,7 +22,7 @@ services:
 
   celery-beat:
     build: .
-    command: poetry run celery -A app.celery.celery beat --loglevel=info
+    command: poetry run celery -A src.celery.celery beat --loglevel=info
     env_file:
       - .env
     profiles:

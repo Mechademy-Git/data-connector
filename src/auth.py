@@ -1,6 +1,6 @@
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from app.config import settings
+from src.config import settings
 
 
 class AuthBearer(HTTPBearer):

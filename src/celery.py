@@ -1,6 +1,6 @@
 from celery import Celery
 from celery.schedules import crontab
-from app.config import settings
+from src.config import settings
 
 
 celery = Celery(
@@ -9,19 +9,19 @@ celery = Celery(
 
 celery.conf.beat_schedule = {
     "fetch-data-schedule": {
-        "task": "app.tasks.scheduled_fetch_data",
+        "task": "src.tasks.scheduled_fetch_data",
         "schedule": crontab(minute=f"*/{settings.fetch_data_interval}"),
     },
 }
 
 
-celery.autodiscover_tasks(["app"])
+celery.autodiscover_tasks(["src"])
 
 celery.conf.update(
     task_default_retry_delay=60,
     task_annotations={"*": {"max_retries": 10}},
     task_routes={
-        "app.tasks.*": {"queue": "celery"},
+        "src.tasks.*": {"queue": "celery"},
     },
     broker_connection_retry_on_startup=True,
 )

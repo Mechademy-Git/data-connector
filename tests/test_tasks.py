@@ -1,12 +1,12 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta
-from app.tasks import fetch_data, scheduled_fetch_data, post_data
-from app.config import settings
+from src.tasks import fetch_data, scheduled_fetch_data, post_data
+from src.config import settings
 
 
-@patch("app.tasks.fetch_helper")
-@patch("app.tasks.post_data.delay")
+@patch("src.tasks.fetch_helper")
+@patch("src.tasks.post_data.delay")
 def test_fetch_data(mock_post_data_delay, mock_fetch_helper):
     mock_fetch_helper.return_value = [
         {"sensor": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"}
@@ -26,10 +26,10 @@ def test_fetch_data(mock_post_data_delay, mock_fetch_helper):
     )
 
 
-@patch("app.tasks.datetime")
-@patch("app.tasks.get_latest_run_time")
-@patch("app.tasks.update_latest_run_time")
-@patch("app.tasks.fetch_data.delay")
+@patch("src.tasks.datetime")
+@patch("src.tasks.get_latest_run_time")
+@patch("src.tasks.update_latest_run_time")
+@patch("src.tasks.fetch_data.delay")
 def test_scheduled_fetch_data(
     mock_fetch_data_delay,
     mock_update_latest_run_time,
@@ -48,8 +48,8 @@ def test_scheduled_fetch_data(
     mock_update_latest_run_time.assert_called_once_with(end_time)
 
 
-@patch("app.tasks.requests.post")
-@patch("app.tasks.group_data_by_sensor")
+@patch("src.tasks.requests.post")
+@patch("src.tasks.group_data_by_sensor")
 def test_post_data(mock_group_data_by_sensor, mock_requests_post):
     mock_group_data_by_sensor.return_value = {
         "sensor_1": [{"time": "2021-07-01T12:00:00", "value": 10}]

@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.main import app as fastapi_app
-from app.config import settings
+from src.main import app as fastapi_app
+from src.config import settings
 
 client = TestClient(fastapi_app)
 
@@ -12,8 +12,8 @@ def mock_api_key():
 
 
 def test_raise_request(mocker, mock_api_key):
-    mocker.patch("app.auth.AuthBearer.__call__", return_value=mock_api_key)
-    mocker.patch("app.tasks.fetch_data.delay", return_value=mocker.Mock(id="task_id"))
+    mocker.patch("src.auth.AuthBearer.__call__", return_value=mock_api_key)
+    mocker.patch("src.tasks.fetch_data.delay", return_value=mocker.Mock(id="task_id"))
 
     response = client.post(
         "/api/v1/raise-request",
@@ -26,9 +26,9 @@ def test_raise_request(mocker, mock_api_key):
 
 
 def test_get_task_status_pending(mocker, mock_api_key):
-    mocker.patch("app.auth.AuthBearer.__call__", return_value=mock_api_key)
+    mocker.patch("src.auth.AuthBearer.__call__", return_value=mock_api_key)
     mock_async_result = mocker.Mock(state="PENDING", info={})
-    mocker.patch("app.main.AsyncResult", return_value=mock_async_result)
+    mocker.patch("src.main.AsyncResult", return_value=mock_async_result)
 
     response = client.get(
         "/api/v1/tasks/task_id", headers={"Authorization": f"Bearer {mock_api_key}"}

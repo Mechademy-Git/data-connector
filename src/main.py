@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
-from app.auth import AuthBearer
-from app.models import RequestTimeRange, AsyncTaskResult
+from src.auth import AuthBearer
+from src.models import RequestTimeRange, AsyncTaskResult
 from celery.result import AsyncResult
 from .tasks import fetch_data
 
