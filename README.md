@@ -67,6 +67,10 @@ Before running the project, make sure you have the following installed:
         docker compose --profile request --profile schedule up --build
         ```
 
+## How It Works
+
+![Architecture](https://i.imgur.com/dziHmoe.png)
+
 ## Custom Implementation
 
 ### Implement [fetch_helper](./app/utils.py) function
