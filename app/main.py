@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
-from app.auth import api_key_auth
+from app.auth import AuthBearer
 from app.models import RequestTimeRange, AsyncTaskResult
 from celery.result import AsyncResult
 from .tasks import fetch_data
@@ -9,7 +9,7 @@ app = FastAPI()
 
 
 @app.post("/raise-request", response_model=AsyncTaskResult)
-async def raise_request(time_range: RequestTimeRange, _: str = Depends(api_key_auth)):
+async def raise_request(time_range: RequestTimeRange, _: str = Depends(AuthBearer())):
     try:
         task = fetch_data.delay(time_range.start_time, time_range.end_time)
         return {"task_id": task.id, "status": "task submitted"}
@@ -18,7 +18,7 @@ async def raise_request(time_range: RequestTimeRange, _: str = Depends(api_key_a
 
 
 @app.get("/tasks/{task_id}")
-def get_task_status(task_id: str, _: str = Depends(api_key_auth)):
+def get_task_status(task_id: str, _: str = Depends(AuthBearer())):
     task = AsyncResult(task_id)
     if task.state == "PENDING":
         response = {
