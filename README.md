@@ -143,5 +143,25 @@ def update_latest_run_time(timestamp: datetime):
     db.commit()
 ```
 
+## Limitations of Schedule Only Mode
+While the schedule only mode offers convenience for automated data fetching, there are several limitations to be aware of:
+
+1. Dependency on Timing:
+    Scheduled tasks rely on precise timing, which can be disrupted by server downtime, network issues, or resource constraints. This can result in missed data fetches or delays.
+
+2. Inflexibility:
+    Scheduled tasks are not easily adaptable to dynamic changes in data patterns or unexpected high-frequency data updates. Manual intervention may be needed to adjust schedules.
+
+3. Resource Utilization:
+    Continuous polling at fixed intervals can lead to inefficient resource utilization, especially during periods with little or no new data. This can increase operational costs and affect system performance.
+
+4. Scalability:
+    As the volume of data or the number of sensors increases, the fixed schedule might not scale effectively. Adjusting schedules to accommodate higher data loads can become complex and resource-intensive.
+
+5. Error Handling:
+    Scheduled tasks may not have robust mechanisms for handling failures or retrying operations, leading to potential data loss or inconsistencies if a scheduled task fails to execute.
+
+These limitations highlight the need for careful consideration when using schedule only mode for data fetching. Depending on application's requirements, combining scheduled tasks with event-driven data fetching i.e. `request mode` might provide a more robust and flexible solution.
+
 ## Note
 > For more details visit: [Turbomechanica Docs](https://docs.turbomechanica.ai)
