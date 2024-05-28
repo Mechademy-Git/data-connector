@@ -1,3 +1,4 @@
+from typing import Optional, Union
 from pydantic import BaseModel
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime
@@ -14,7 +15,17 @@ class AsyncTaskResult(BaseModel):
     status: str
 
 
-class SensorData(Base):
+class SensorData(BaseModel):
+    sensor: str
+    value: Union[int, float, str, None]
+    timestamp: datetime
+
+
+class SensorDataTable(Base):
+    """Update the class definition to match the database schema"""
+
+    # Example: If the database schema is as follows:
+
     __tablename__ = "sensor_data"
 
     id = Column(Integer, primary_key=True, index=True)
