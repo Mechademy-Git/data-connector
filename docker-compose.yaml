@@ -5,27 +5,28 @@ services:
     build: .
     ports:
       - "8000:8000"
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    env_file:
+      - .env
+    profiles:
+      - "request"
     depends_on:
       - redis
 
   celery:
     build: .
     command: poetry run celery -A app.celery.celery worker --loglevel=info
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    env_file:
+      - .env
     depends_on:
       - redis
 
   celery-beat:
     build: .
     command: poetry run celery -A app.celery.celery beat --loglevel=info
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    env_file:
+      - .env
+    profiles:
+      - "schedule"
     depends_on:
       - redis
 
