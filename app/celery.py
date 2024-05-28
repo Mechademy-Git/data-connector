@@ -18,6 +18,8 @@ celery.conf.beat_schedule = {
 celery.autodiscover_tasks(["app"])
 
 celery.conf.update(
+    task_default_retry_delay=60,
+    task_annotations={"*": {"max_retries": 10}},
     task_routes={
         "app.tasks.*": {"queue": "celery"},
     },
