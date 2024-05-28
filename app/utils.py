@@ -34,6 +34,39 @@ def fetch_helper(start_time: str, end_time: str) -> List[SensorData]:
     return sensor_data
 
 
+def get_latest_run_time() -> datetime:
+    """
+    Implement the logic to get scheduler's last run time
+    For example, you might want to fetch the last ran time from a database
+    """
+
+    # Example 1: Fetch the last ran time from a database
+    # db = get_db()
+    # last_ran_time = db.query(LastRanTimeTable).first()
+
+    # return last_ran_time
+
+    # Remove hard-coded data below after implementing the logic to fetch the last ran time
+    last_ran_time = "2021-07-01T12:00:00"
+    return last_ran_time
+
+
+def update_latest_run_time(timestamp: datetime):
+    """
+    Implement the logic to update scheduler's last run time
+    For example, you might want to update the last ran time in a database
+    """
+
+    # Example 1: Update the last ran time in a database
+    # db = get_db()
+    # last_ran_time = db.query(LastRanTimeTable).first()
+    # last_ran_time.timestamp = datetime.now()
+    # db.commit()
+
+    # Remove hard-coded data below after implementing the logic to update the last ran time
+    pass
+
+
 def group_data_by_sensor(data: List[SensorData]):
     grouped_data = defaultdict(list)
 

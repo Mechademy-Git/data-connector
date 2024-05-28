@@ -107,6 +107,37 @@ Querying data from a SQL (Relational) Database.
 
     ```
 
+### Implement [get_latest_run_time](./app/utils.py) and [update_latest_run_time](./app/utils.py) functions
+If you are using `schedule` mode, implement these functions to let the scheduler know upto what time data has already been sent.
+
+#### Example Implementation
+Querying data from a SQL (Relational) Database.
+
+```python
+class BookMarksTable(Base):
+    __tablename__ = "bookmarks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    timestamp = Column(DateTime)
+```
+
+```python
+from datetime import datetime
+from .db import get_db
+from .models import BookMarksTable
+
+def get_latest_run_time() -> datetime:
+    db = get_db()
+    last_ran_time = db.query(BookMarksTable).first()
+    return last_ran_time
+
+def update_latest_run_time(timestamp: datetime):
+    db = get_db()
+    last_ran_time = db.query(BookMarksTable).first()
+    last_ran_time.timestamp = datetime.now()
+    db.commit()
+```
 
 ## Note
 > For more details visit: [Turbomechanica Docs](https://docs.turbomechanica.ai)

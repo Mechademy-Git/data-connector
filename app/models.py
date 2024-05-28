@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Union
 from pydantic import BaseModel
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime
@@ -19,6 +19,18 @@ class SensorData(BaseModel):
     sensor: str
     value: Union[int, float, str, None]
     timestamp: datetime
+
+
+class BookMarksTable(Base):
+    """Update the class definition to match the database schema"""
+
+    # Example: If the database schema is as follows:
+
+    __tablename__ = "bookmarks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    timestamp = Column(DateTime)
 
 
 class SensorDataTable(Base):

@@ -3,7 +3,12 @@ import logging
 from datetime import datetime, timedelta
 from .celery import celery as app
 from .config import settings
-from .utils import fetch_helper, group_data_by_sensor
+from .utils import (
+    fetch_helper,
+    group_data_by_sensor,
+    get_latest_run_time,
+    update_latest_run_time,
+)
 
 
 @app.task
@@ -16,11 +21,10 @@ def fetch_data(start_time: datetime, end_time: datetime):
 
 @app.task
 def scheduled_fetch_data():
-    end_time = datetime.now()
-    start_time = end_time - timedelta(minutes=30)
-    start_time_str = start_time.isoformat()
-    end_time_str = end_time.isoformat()
-    fetch_data.delay(start_time_str, end_time_str)
+    start_time = datetime.fromisoformat(get_latest_run_time())
+    end_time = start_time + timedelta(minutes=settings.fetch_data_interval)
+    fetch_data.delay(start_time, end_time)
+    update_latest_run_time(end_time)
     return {"status": "success", "message": "Task scheduled"}
 
 
