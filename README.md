@@ -2,6 +2,7 @@
 
 This is the README file for the Data Connector. It provides instructions on how to run the project.
 
+[![Sonar Cloud](https://github.com/Mechademy-Git/data-connector/actions/workflows/sonarcloud.yaml/badge.svg)](https://github.com/Mechademy-Git/data-connector/actions/workflows/sonarcloud.yaml)
 [![CodeQL](https://github.com/Mechademy-Git/data-connector/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Mechademy-Git/data-connector/actions/workflows/github-code-scanning/codeql)
 [![Continuous Integration](https://github.com/Mechademy-Git/data-connector/actions/workflows/ci.yaml/badge.svg)](https://github.com/Mechademy-Git/data-connector/actions/workflows/ci.yaml)
 <a href="https://github.com/Mechademy-Git/data-connector/"><img src="https://img.shields.io/badge/python-3.9-fec100?labelColor=fec100&color=163B36"></a>
