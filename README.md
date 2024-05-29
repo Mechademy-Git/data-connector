@@ -2,6 +2,8 @@
 
 This is the README file for the Data Connector. It provides instructions on how to run the project.
 
+[![CodeQL](https://github.com/Mechademy-Git/data-connector/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Mechademy-Git/data-connector/actions/workflows/github-code-scanning/codeql)   [![ContinousIntegration](https://github.com/Mechademy-Git/data-connector/actions/workflows/ci.yaml/badge.svg)](https://github.com/Mechademy-Git/data-connector/actions/workflows/ci.yaml)
+
 ## Prerequisites
 
 Before running the project, make sure you have the following installed:
