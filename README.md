@@ -2,7 +2,10 @@
 
 This is the README file for the Data Connector. It provides instructions on how to run the project.
 
-[![CodeQL](https://github.com/Mechademy-Git/data-connector/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Mechademy-Git/data-connector/actions/workflows/github-code-scanning/codeql)   [![ContinousIntegration](https://github.com/Mechademy-Git/data-connector/actions/workflows/ci.yaml/badge.svg)](https://github.com/Mechademy-Git/data-connector/actions/workflows/ci.yaml)
+[![CodeQL](https://github.com/Mechademy-Git/data-connector/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Mechademy-Git/data-connector/actions/workflows/github-code-scanning/codeql)
+[![Continuous Integration](https://github.com/Mechademy-Git/data-connector/actions/workflows/ci.yaml/badge.svg)](https://github.com/Mechademy-Git/data-connector/actions/workflows/ci.yaml)
+<a href="https://github.com/Mechademy-Git/data-connector/"><img src="https://img.shields.io/badge/python-3.9-fec100?labelColor=fec100&color=163B36"></a>
+<a href="https://github.com/Mechademy-Git/data-connector?tab=GPL-3.0-1-ov-file"><img src="https://img.shields.io/badge/license-GPL%203.0-fec100?label=license&labelColor=fec100&color=163B36"></a>
 
 ## Prerequisites
 
