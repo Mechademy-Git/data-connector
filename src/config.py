@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-
+from pathlib import Path
 
 class Settings(BaseSettings):
     celery_broker_url: str = "redis://localhost:6379/0"
@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     batch_size: int = 30  # minutes
 
     class Config:
-        env_file = ".env"
+        env_file = Path.cwd().parent / ".env"
 
 
 settings = Settings()
