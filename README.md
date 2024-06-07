@@ -8,13 +8,15 @@ This is the README file for the Data Connector. It provides instructions on how 
 <a href="https://github.com/Mechademy-Git/data-connector/"><img src="https://img.shields.io/badge/python-3.9-fec100?labelColor=fec100&color=163B36"></a>
 <a href="https://github.com/Mechademy-Git/data-connector?tab=GPL-3.0-1-ov-file"><img src="https://img.shields.io/badge/license-GPL%203.0-fec100?label=license&labelColor=fec100&color=163B36"></a>
 
-## Prerequisites
+## Installation
+
+### For Docker implementation:
+
+### Prerequisites
 
 Before running the project, make sure you have the following installed:
 
 - [Docker](https://www.docker.com)
-
-## Installation
 
 1. Clone the repository:
 
@@ -72,9 +74,7 @@ Before running the project, make sure you have the following installed:
      docker compose --profile request --profile schedule up --build
      ```
 
-- [Windows Server](https://www.microsoft.com/en-in/windows-server)
-
-## Installation
+### For Windows Server:
 
 1. Open a new powershell terminal (with administrator privileges)
 
