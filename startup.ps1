@@ -80,17 +80,23 @@ cd "$ProjectPath\nssm-2.24\win64"
 
 .\nssm.exe start RabbitMQ
 
+Start-Sleep -Seconds 2
+
 .\nssm.exe install mechademy-celery-worker "$ProjectPath\start_celery_worker.bat"
 .\nssm.exe set mechademy-celery-worker AppDirectory $ProjectPath
 .\nssm.exe set mechademy-celery-worker AppStdout $ProjectPath\celery_worker.log
 .\nssm.exe set mechademy-celery-worker AppStderr $ProjectPath\celery_worker_error.log
 .\nssm.exe start mechademy-celery-worker
 
+Start-Sleep -Seconds 2
+
 .\nssm.exe install mechademy-celery-beat "$ProjectPath\start_celery_beat.bat"
 .\nssm.exe set mechademy-celery-beat AppDirectory "$ProjectPath"
 .\nssm.exe set mechademy-celery-beat AppStdout "$ProjectPath\celery_beat.log"
 .\nssm.exe set mechademy-celery-beat AppStderr "$ProjectPath\celery_beat_error.log"
 .\nssm.exe start mechademy-celery-beat
+
+Start-Sleep -Seconds 2
 
 .\nssm.exe install mechademy-server "$ProjectPath\start_server.bat"
 .\nssm.exe set mechademy-server AppDirectory "$ProjectPath"
