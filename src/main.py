@@ -3,6 +3,7 @@ from src.auth import AuthBearer
 from src.models import RequestTimeRange, AsyncTaskResult
 from celery.result import AsyncResult
 from .tasks import fetch_data
+from .celery import celery as celery_app
 
 
 app = FastAPI()
@@ -19,7 +20,7 @@ async def raise_request(time_range: RequestTimeRange, _: str = Depends(AuthBeare
 
 @app.get("/tasks/{task_id}")
 def get_task_status(task_id: str, _: str = Depends(AuthBearer())):
-    task = AsyncResult(task_id)
+    task = AsyncResult(task_id, app=celery_app)
     if task.state == "PENDING":
         response = {
             "state": task.state,
