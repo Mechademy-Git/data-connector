@@ -1,23 +1,7 @@
-Write-Output "Setting up Environment Variables ..."
+Write-Output "Setting up Initial environment ..."
 $erlPath = "C:\Program Files\erl-24.0"
 $RmqPath = "C:\Program Files\RabbitMQ Server\rabbitmq_server-3.9.12"
 $ProjectPath = "C:\Program Files\Mechademy\data-connector-main"
-
-$file = ".env"
-
-# Define environment variables
-$envVariables = @{
-    "CELERY_BROKER_URL" = "amqp://guest:guest@localhost//"
-    "CELERY_RESULT_BACKEND" = "rpc://"
-}
-
-# Create content with an empty line at the beginning
-$content = foreach ($pair in $envVariables.GetEnumerator()) {
-    "`n$($pair.Key)=$($pair.Value)"
-}
-
-# Write content to file
-$content | Out-File -FilePath $file -Encoding utf8 -Force
 
 Write-Output "Installing Python ..."
 Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.10.2/python-3.10.2-amd64.exe" -OutFile "$env:TEMP\python-3.10.2-amd64.exe"
