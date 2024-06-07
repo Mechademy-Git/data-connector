@@ -88,4 +88,4 @@ Start-Sleep -Seconds 2
 .\nssm.exe set mechademy-server AppStderr "$ProjectPath\server_error.log"
 .\nssm.exe start mechademy-server
 
-Write-Output "Setup Completed Successfully :)"
+Write-Output "Scheduler started successfully :)"
