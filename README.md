@@ -89,7 +89,9 @@ Before running the project, make sure you have the following installed:
    ni .env
    ```
 
-3. Update the `.env` file in the project's root directory right next to example.env and provide the required environment variables.
+3. Open File Explorer and go to "C:\Program Files\Mechademy\data-connector-main"
+
+4. Update the `.env` file right next to example.env and provide the required environment variables.
 
    ```powershell
    # Celery settings
@@ -109,15 +111,16 @@ Before running the project, make sure you have the following installed:
    # Scheduler Config
    FETCH_DATA_INTERVAL=1
    BATCH_SIZE=30
+
    ```
 
-4. Run the startup script:
+5. Run the startup script:
 
    ```powershell
    .\startup.ps1 -Verbose -Debug
    ```
 
-5. Start the RabbitMQ management plugin:
+6. Start the RabbitMQ management plugin:
 
    Note: Open a new Powershell terminal with administrator privileges
 
