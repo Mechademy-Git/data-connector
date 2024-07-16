@@ -22,7 +22,9 @@ def test_fetch_data(mock_post_data_delay, mock_fetch_helper):
     assert result == {"task_id": task_id, "status": "success"}
     mock_fetch_helper.assert_called_once_with(start_time, end_time)
     mock_post_data_delay.assert_called_once_with(
-        [{"sensor": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"}]
+        start_time,
+        end_time,
+        [{"sensor": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"}],
     )
 
 
@@ -52,18 +54,24 @@ def test_scheduled_fetch_data(
 @patch("src.tasks.group_data_by_sensor")
 def test_post_data(mock_group_data_by_sensor, mock_requests_post):
     mock_group_data_by_sensor.return_value = {
-        "sensor_1": [{"time": "2021-07-01T12:00:00", "value": 10}]
+        "sensor_1": [{"timestamp": "2021-07-01T12:00:00", "value": 10}]
     }
     mock_requests_post.return_value.status_code = 200
+    start_time = datetime(2021, 7, 1, 12, 0, 0)
+    end_time = start_time + timedelta(minutes=settings.fetch_data_interval)
     sensor_data = [
         {"sensor": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"}
     ]
-    result = post_data(sensor_data)
+    result = post_data(start_time, end_time, sensor_data)
     assert result == {"status": "success", "message": "Data posted successfully"}
     mock_group_data_by_sensor.assert_called_once_with(sensor_data)
     mock_requests_post.assert_called_once_with(
         settings.post_data_endpoint,
-        json={"sensor_1": [{"time": "2021-07-01T12:00:00", "value": 10}]},
+        json={
+            "start_time": start_time.isoformat(),
+            "end_time": end_time.isoformat(),
+            "data": {"sensor_1": [{"timestamp": "2021-07-01T12:00:00", "value": 10}]},
+        },
         headers={
             "Content-Type": "application/json",
             "Authorization": f"Bearer {settings.post_data_api_key}",

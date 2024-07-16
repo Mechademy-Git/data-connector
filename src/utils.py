@@ -75,6 +75,6 @@ def group_data_by_sensor(data: List[SensorData]):
         timestamp = entry["timestamp"]
         value = entry["value"]
 
-        grouped_data[sensor].append({"time": timestamp, "value": value})
+        grouped_data[sensor].append({"timestamp": timestamp, "value": value})
 
     return dict(grouped_data)
