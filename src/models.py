@@ -1,7 +1,7 @@
 from typing import Union
 from pydantic import BaseModel
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Float
 from .db import Base
 
 
@@ -38,9 +38,9 @@ class SensorDataTable(Base):
 
     # Example: If the database schema is as follows:
 
-    __tablename__ = "sensor_data"
+    __tablename__ = "core_sensordata"
 
     id = Column(Integer, primary_key=True, index=True)
-    sensor = Column(String, index=True)
-    value = Column(Integer)
+    sensor_id = Column(Integer, index=True)
+    value = Column(Float)
     timestamp = Column(DateTime)

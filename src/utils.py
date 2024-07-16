@@ -3,9 +3,10 @@ from datetime import datetime
 from typing import List
 from .db import get_db
 from .models import SensorDataTable, SensorData
+from .schemas import SensorDataSchema
 
 
-def fetch_helper(start_time: str, end_time: str) -> List[SensorData]:
+def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
     """
     Implement the logic to fetch data based on start_time and end_time
     For example, you might want to fetch data from a database or an external API
@@ -22,12 +23,12 @@ def fetch_helper(start_time: str, end_time: str) -> List[SensorData]:
 
     # Remove hard-coded data below after implementing the logic to fetch data
     sensor_data = [
-        {"sensor": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"},
-        {"sensor": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:30"},
-        {"sensor": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:00"},
-        {"sensor": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:30"},
-        {"sensor": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:00"},
-        {"sensor": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:30"},
+        {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"},
+        {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:30"},
+        {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:00"},
+        {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:30"},
+        {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:00"},
+        {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:30"},
     ]
     return sensor_data
 
@@ -69,8 +70,12 @@ def group_data_by_sensor(data: List[SensorData]):
     grouped_data = defaultdict(list)
 
     for entry in data:
-        sensor = entry["sensor"]
-        timestamp = entry["timestamp"]
+        sensor = entry["sensor_id"]
+        timestamp = (
+            entry["timestamp"].isoformat()
+            if isinstance(entry["timestamp"], datetime)
+            else entry["timestamp"]
+        )
         value = entry["value"]
 
         grouped_data[sensor].append({"timestamp": timestamp, "value": value})
