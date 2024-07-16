@@ -12,15 +12,13 @@ def fetch_helper(start_time: str, end_time: str) -> List[SensorData]:
     """
 
     # Example 1: Fetch data from a database
-    # db = get_db()
-    # start_time_dt = datetime.fromisoformat(start_time)
-    # end_time_dt = datetime.fromisoformat(end_time)
-    # sensor_data = db.query(SensorDataTable).filter(
-    #     SensorDataTable.timestamp >= start_time_dt,
-    #     SensorDataTable.timestamp <= end_time_dt
-    # ).all()
-
-    # return sensor_data
+    # with get_db() as db:
+    #     sensor_data = db.query(SensorDataTable).filter(
+    #         SensorDataTable.timestamp >= start_time,
+    #         SensorDataTable.timestamp <= end_time
+    #     ).all()
+    #     sensor_data = [SensorDataSchema.model_validate(data).model_dump() for data in sensor_data]
+    #     return sensor_data
 
     # Remove hard-coded data below after implementing the logic to fetch data
     sensor_data = [

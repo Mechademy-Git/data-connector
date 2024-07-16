@@ -49,3 +49,6 @@ credentials.txt
 # Ignore miscellaneous files
 Thumbs.db
 __pycache__
+
+# DB Files
+*.sqlite3
