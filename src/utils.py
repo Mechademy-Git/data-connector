@@ -4,6 +4,7 @@ from typing import List
 from .db import get_db
 from .models import SensorDataTable, SensorData
 from .schemas import SensorDataSchema
+from .config import tags
 
 
 def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
@@ -11,26 +12,27 @@ def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
     Implement the logic to fetch data based on start_time and end_time
     For example, you might want to fetch data from a database or an external API
     """
-
+    print(tags)
     # Example 1: Fetch data from a database
-    # with get_db() as db:
-    #     sensor_data = db.query(SensorDataTable).filter(
-    #         SensorDataTable.timestamp >= start_time,
-    #         SensorDataTable.timestamp <= end_time
-    #     ).all()
-    #     sensor_data = [SensorDataSchema.model_validate(data).model_dump() for data in sensor_data]
-    #     return sensor_data
+    with get_db() as db:
+        sensor_data = db.query(SensorDataTable).filter(
+            SensorDataTable.timestamp >= start_time,
+            SensorDataTable.timestamp <= end_time,
+            SensorDataTable.sensor_id.in_(tags)
+        ).all()
+        sensor_data = [SensorDataSchema.model_validate(data).model_dump() for data in sensor_data]
+        return sensor_data
 
     # Remove hard-coded data below after implementing the logic to fetch data
-    sensor_data = [
-        {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"},
-        {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:30"},
-        {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:00"},
-        {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:30"},
-        {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:00"},
-        {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:30"},
-    ]
-    return sensor_data
+    # sensor_data = [
+    #     {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"},
+    #     {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:30"},
+    #     {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:00"},
+    #     {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:30"},
+    #     {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:00"},
+    #     {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:30"},
+    # ]
+    # return sensor_data
 
 
 def get_latest_run_time() -> datetime:
