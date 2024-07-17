@@ -78,20 +78,40 @@ Before running the project, make sure you have the following installed:
 
 1. Open a new powershell terminal (with administrator privileges)
 
-2. Clone the repository:
+2. Install Git
+
+   ```powershell
+   $gitVersion = "2.39.1"
+   $gitInstallerUrl = "https://github.com/git-for-windows/git/releases/download/v${gitVersion}.windows.1/Git-${gitVersion}-64-bit.exe"
+   $gitInstallerPath = "$env:TEMP\Git-${gitVersion}-64-bit.exe"
+
+   Invoke-WebRequest -Uri $gitInstallerUrl -OutFile $gitInstallerPath
+   Start-Process -FilePath $gitInstallerPath -ArgumentList "/VERYSILENT" -Wait
+   Remove-Item -Path $gitInstallerPath
+   function Refresh-EnvironmentVariables {
+      $env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ";" + [System.Environment]::GetEnvironmentVariable('Path', 'User')
+   }
+   Refresh-EnvironmentVariables
+   git --version
+   ```
+
+3. Clone the repository:
 
    ```
-   New-Item -ItemType Directory -Path "C:\Program Files\Mechademy" | Out-Null
-   Invoke-WebRequest -Uri "https://github.com/Mechademy-Git/data-connector/archive/refs/heads/main.zip" -OutFile "C:\Program Files\Mechademy\data-connector.zip"
-   Expand-Archive -Path "C:\Program Files\Mechademy\data-connector.zip" -DestinationPath "C:\Program Files\Mechademy"
-   Remove-Item "C:\Program Files\Mechademy\data-connector.zip"
-   cd "C:\Program Files\Mechademy\data-connector-main"
+   $RootPath = "C:\Program Files\Mechademy"
+   $ProjectPath = "C:\Program Files\Mechademy\data-connector"
+
+   New-Item -ItemType Directory -Path $RootPath | Out-Null
+   cd $RootPath
+
+   git clone https://github.com/Mechademy-Git/data-connector.git
+   cd $ProjectPath
    ni .env
    ```
 
-3. Open File Explorer and go to "C:\Program Files\Mechademy\data-connector-main"
+4. Open File Explorer and go to "C:\Program Files\Mechademy\data-connector"
 
-4. Update the `.env` file right next to example.env and provide the required environment variables.
+5. Update the `.env` file right next to example.env and provide the required environment variables.
 
    ```powershell
    # Celery settings
@@ -114,18 +134,27 @@ Before running the project, make sure you have the following installed:
 
    ```
 
-5. Run the startup script:
+6. Run the startup script:
 
    ```powershell
+   cd $ProjectPath
    .\startup.ps1 -Verbose -Debug
    ```
 
-6. Start the RabbitMQ management plugin:
-
-   Note: Open a new Powershell terminal with administrator privileges
+7. Start the RabbitMQ management plugin:
 
    ```powershell
+   function Refresh-EnvironmentVariables {
+    $env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ";" + [System.Environment]::GetEnvironmentVariable('Path', 'User')
+   }
+   Refresh-EnvironmentVariables
    rabbitmq-plugins enable rabbitmq_management
+   ```
+
+8. Update the project
+   ```powershell
+   cd "C:\Program Files\Mechademy\data-connector"
+   .\update.ps1 -Verbose -Debug
    ```
 
 ## How It Works
