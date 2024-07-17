@@ -1,7 +1,8 @@
 Write-Output "Setting up Initial environment ..."
 $erlPath = "C:\Program Files\erl-24.0"
 $RmqPath = "C:\Program Files\RabbitMQ Server\rabbitmq_server-3.9.12"
-$ProjectPath = "C:\Program Files\Mechademy\data-connector-main"
+$ProjectPath = "C:\Program Files\Mechademy\data-connector"
+$RootPath = "C:\Program Files\Mechademy"
 
 Write-Output "Installing Python ..."
 Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.10.2/python-3.10.2-amd64.exe" -OutFile "$env:TEMP\python-3.10.2-amd64.exe"
@@ -51,16 +52,15 @@ cd $ProjectPath
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install poetry
-poetry lock --no-update
 poetry install --no-root
 
 Write-Output "Installing NSSM ..."
-Invoke-WebRequest -Uri "https://www.nssm.cc/release/nssm-2.24.zip" -OutFile "$ProjectPath\nssm.zip"
-Expand-Archive -Path "$ProjectPath\nssm.zip" -DestinationPath "$ProjectPath"
-Remove-Item "$ProjectPath\nssm.zip"
+Invoke-WebRequest -Uri "https://www.nssm.cc/release/nssm-2.24.zip" -OutFile "$RootPath\nssm.zip"
+Expand-Archive -Path "$RootPath\nssm.zip" -DestinationPath "$RootPath"
+Remove-Item "$RootPath\nssm.zip"
 
 Write-Output "Starting Services ..."
-cd "$ProjectPath\nssm-2.24\win64"
+cd "$RootPath\nssm-2.24\win64"
 
 .\nssm.exe start RabbitMQ
 
