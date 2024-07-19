@@ -11,7 +11,6 @@ from .utils import (
     update_latest_run_time,
 )
 
-
 @dlt.resource()
 def fetch_data(start_time: datetime, end_time: datetime):
     """
@@ -84,7 +83,7 @@ def run_pipeline(self, start_time: datetime, end_time: datetime):
             dataset_name="sensor_data",
         )
 
-        info = pipeline.run(fetch_data(start_time, end_time), loader_file_format="j")
+        info = pipeline.run(fetch_data(start_time, end_time), loader_file_format="csv")
         update_latest_run_time(end_time)
         return {
             "status": "success",

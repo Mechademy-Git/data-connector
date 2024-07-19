@@ -16,6 +16,7 @@ psycopg2-binary = "^2.9.9"
 requests = "^2.32.2"
 databases = "^0.9.0"
 dlt = "^0.5.1"
+pandas = "^2.2.2"
 
 
 [tool.poetry.group.dev.dependencies]
