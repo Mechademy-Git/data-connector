@@ -1,7 +1,7 @@
 import yaml
 
 
-def construct_query(config_path="../config.yaml"):
+def construct_query(config_path="../fetch_query.yaml"):
     # Load configuration from YAML file
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
@@ -15,7 +15,7 @@ def construct_query(config_path="../config.yaml"):
 
     # Parameterized SQL query
     query = f"""
-    SELECT {tag_name_field} AS tag_name, {timestamp_field} AS ts_time_stamp, {value_field} AS ts_value, quality AS ts_quality 
+    SELECT {tag_name_field} AS tag_name, {timestamp_field} AS timestamp, {value_field} AS value, quality AS ts_quality 
     FROM {database_name}.dbo.{function_name}(
         '{tags}', 
         GETDATE() - 1, 

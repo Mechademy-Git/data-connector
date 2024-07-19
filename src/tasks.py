@@ -9,8 +9,8 @@ from .utils import (
     fetch_helper,
     get_latest_run_time,
     update_latest_run_time,
+    group_data_by_sensor
 )
-
 
 @dlt.resource()
 def fetch_data(start_time: datetime, end_time: datetime):
@@ -27,19 +27,10 @@ def fetch_data(start_time: datetime, end_time: datetime):
     logging.info(f"Fetching data from {start_time} to {end_time}")
     sensor_data = fetch_helper(start_time, end_time)
     for data in sensor_data:
-        yield {**data}
+        yield {"sensor_id": data['tag_name'], "value": data['value'], "timestamp": data['timestamp']}
 
 
-# Optional transformer for manipulating data pre-load
-# Lots of flexibility. Can read and write using pandas, can enforce schema if needed, can also simply return instead of yield.
-# Uncomment if needed
-# @dlt.transformer(data_from=fetch_data)
-# def transform_data(data):
-#     for item in data:
-#         yield item
-
-
-@dlt.destination(batch_size=10)
+@dlt.destination(batch_size=1000)
 def post_data(data, schema):
     """
     Post data to the API endpoint.
@@ -54,12 +45,15 @@ def post_data(data, schema):
     headers = {
         "Content-Type": "application/json",
     }
+    grouped_data = group_data_by_sensor(data)
+
     client = RESTClient(
         base_url=settings.api_base_url,
         headers=headers,
         auth=BearerTokenAuth(token=settings.post_data_api_key),
     )
-    response = client.post(path=settings.api_post_endpoint, json=data)
+
+    response = client.post(path=settings.api_post_endpoint, json=grouped_data)
     response.raise_for_status()
     return {"status": "success", "message": "Data posted successfully"}
 

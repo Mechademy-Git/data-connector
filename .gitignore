@@ -8,6 +8,7 @@
 /node_modules
 /.venv
 /bower_components
+/venv
 
 # Ignore build output
 /build
@@ -52,6 +53,3 @@ __pycache__
 
 # DB Files
 *.sqlite3
-
-# Ignore venv manually
-venv/
