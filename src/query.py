@@ -1,16 +1,17 @@
 import yaml
 
-def construct_query(config_path='config.yaml'):
+
+def construct_query(config_path="../config.yaml"):
     # Load configuration from YAML file
-    with open(config_path, 'r') as file:
+    with open(config_path, "r") as file:
         config = yaml.safe_load(file)
 
-    tags = ",".join(config['tags'])
-    database_name = config['database']['name']
-    function_name = config['database']['function']
-    tag_name_field = config['fields']['tag_name']
-    timestamp_field = config['fields']['timestamp']
-    value_field = config['fields']['value']
+    tags = ",".join(config["tags"])
+    database_name = config["database"]["name"]
+    function_name = config["database"]["function"]
+    tag_name_field = config["fields"]["tag_name"]
+    timestamp_field = config["fields"]["timestamp"]
+    value_field = config["fields"]["value"]
 
     # Parameterized SQL query
     query = f"""

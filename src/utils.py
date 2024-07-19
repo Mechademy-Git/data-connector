@@ -5,6 +5,7 @@ from .db import get_db
 from .models import SensorDataTable, SensorData
 from .schemas import SensorDataSchema
 from sqlalchemy import text
+from .query import construct_query
 import pandas as pd
 
 
@@ -14,46 +15,18 @@ def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
     For example, you might want to fetch data from a database or an external API
     """
 
-    # Example 1: Fetch data from a database
-    # with get_db() as db:
-    #     sensor_data = db.query(SensorDataTable).filter(
-    #         SensorDataTable.timestamp >= start_time,
-    #         SensorDataTable.timestamp <= end_time
-    #     ).all()
-    #     sensor_data = [SensorDataSchema.model_validate(data).model_dump() for data in sensor_data]
-    #     return sensor_data
+    sql_query = construct_query("../queries/test_query.sql")
 
-    # Remove hard-coded data below after implementing the logic to fetch data
-
-    # Block below reads the SQL query and then converts into df to orient and return an array of sensor data
-
-    # def read_sql_file(file_path: str) -> str:
-    #     with open(file_path, 'r') as file:
-    #         sql = file.read()
-    #     return sql
-
-    # sql_query = read_sql_file('../queries/test_query.sql')
-
-    # with get_db() as session:
-    #     try:
-    #         result = session.execute(text(sql_query))
-    #         rows = result.fetchall()
-    #         column_names = result.keys()
-    #         df = pd.DataFrame(rows, column_names=column_names)
-    #         json_result = df.to_json(orient='records')
-    #         return json_result
-    #     except Exception as e:
-    #         print(f"An error occured: {e}")
-
-    sensor_data = [
-        {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"},
-        {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:30"},
-        {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:00"},
-        {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:30"},
-        {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:00"},
-        {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:30"},
-    ]
-    return sensor_data
+    with get_db() as session:
+        try:
+            result = session.execute(text(sql_query))
+            rows = result.fetchall()
+            column_names = result.keys()
+            df = pd.DataFrame(rows, column_names=column_names)
+            json_result = df.to_json(orient="records")
+            return json_result
+        except Exception as e:
+            print(f"An error occured: {e}")
 
 
 def get_latest_run_time() -> datetime:
@@ -62,13 +35,6 @@ def get_latest_run_time() -> datetime:
     For example, you might want to fetch the last ran time from a database
     """
 
-    # Example 1: Fetch the last ran time from a database
-    # db = get_db()
-    # last_ran_time = db.query(LastRanTimeTable).first()
-
-    # return last_ran_time
-
-    # Remove hard-coded data below after implementing the logic to fetch the last ran time
     last_ran_time = "2021-07-01T12:00:00"
     return last_ran_time
 

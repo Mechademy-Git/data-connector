@@ -11,6 +11,7 @@ from .utils import (
     update_latest_run_time,
 )
 
+
 @dlt.resource()
 def fetch_data(start_time: datetime, end_time: datetime):
     """
