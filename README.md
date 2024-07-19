@@ -78,20 +78,28 @@ Before running the project, make sure you have the following installed:
 
 1. Open a new powershell terminal (with administrator privileges)
 
-2. Clone the repository:
+2. Install Python
 
-   ```
-   New-Item -ItemType Directory -Path "C:\Program Files\Mechademy" | Out-Null
-   Invoke-WebRequest -Uri "https://github.com/Mechademy-Git/data-connector/archive/refs/heads/main.zip" -OutFile "C:\Program Files\Mechademy\data-connector.zip"
-   Expand-Archive -Path "C:\Program Files\Mechademy\data-connector.zip" -DestinationPath "C:\Program Files\Mechademy"
-   Remove-Item "C:\Program Files\Mechademy\data-connector.zip"
-   cd "C:\Program Files\Mechademy\data-connector-main"
-   ni .env
+   ```powershell
+   Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.10.2/python-3.10.2-amd64.exe" -OutFile "$env:TEMP\python-3.10.2-amd64.exe"
+   Start-Process -FilePath "$env:TEMP\python-3.10.2-amd64.exe" -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1 Include_test=0' -Wait
+   $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
    ```
 
-3. Open File Explorer and go to "C:\Program Files\Mechademy\data-connector-main"
+3. Download manage.py script
 
-4. Update the `.env` file right next to example.env and provide the required environment variables.
+   ```powershell
+   Invoke-WebRequest -Uri https://gist.githubusercontent.com/shubham-sharmaa/eb538d14cb1d4e90e4fb4307b97c82eb/raw/5ad9ecba34c3555b6e617899c30a18d26ee27d7c/script.py -OutFile "manage.py"
+   ```
+
+4. Run below commands:
+
+   ```
+   pip install click requests
+   python manage.py clone-project --repo-url https://github.com/Mechademy-Git/data-connector.git
+   ```
+
+5. Go inside "data-connector" directory and create a .env file and paste required variables
 
    ```powershell
    # Celery settings
@@ -114,18 +122,26 @@ Before running the project, make sure you have the following installed:
 
    ```
 
-5. Run the startup script:
+6. Run below commands to start data-connector services
 
    ```powershell
-   .\startup.ps1 -Verbose -Debug
+   python manage.py install-dependencies
+   python manage.py start-services
    ```
 
-6. Start the RabbitMQ management plugin:
-
-   Note: Open a new Powershell terminal with administrator privileges
+7. Start the RabbitMQ management plugin (Optional):
 
    ```powershell
+   function Refresh-EnvironmentVariables {
+    $env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ";" + [System.Environment]::GetEnvironmentVariable('Path', 'User')
+   }
+   Refresh-EnvironmentVariables
    rabbitmq-plugins enable rabbitmq_management
+   ```
+
+8. Update the project by running below command
+   ```powershell
+   python manage.py update-project
    ```
 
 ## How It Works
