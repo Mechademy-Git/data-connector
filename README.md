@@ -89,7 +89,7 @@ Before running the project, make sure you have the following installed:
 3. Download manage.py script
 
    ```powershell
-   Invoke-WebRequest -Uri https://gist.githubusercontent.com/shubham-sharmaa/eb538d14cb1d4e90e4fb4307b97c82eb/raw/5ad9ecba34c3555b6e617899c30a18d26ee27d7c/script.py -OutFile "manage.py"
+   Invoke-WebRequest -Uri https://gist.githubusercontent.com/shubham-sharmaa/eb538d14cb1d4e90e4fb4307b97c82eb/raw/225da2297d6727442fe26f659df59868cc9a346f/manage.py -OutFile "manage.py"
    ```
 
 4. Run below commands:
