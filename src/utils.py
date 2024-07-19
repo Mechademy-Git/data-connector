@@ -15,7 +15,7 @@ def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
     For example, you might want to fetch data from a database or an external API
     """
 
-    sql_query = construct_query("../queries/test_query.sql")
+    sql_query = construct_query()
 
     with get_db() as session:
         try:
