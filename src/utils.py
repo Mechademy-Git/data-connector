@@ -7,6 +7,7 @@ from .schemas import SensorDataSchema
 from sqlalchemy import text
 import pandas as pd
 
+
 def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
     """
     Implement the logic to fetch data based on start_time and end_time
@@ -29,7 +30,7 @@ def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
     # def read_sql_file(file_path: str) -> str:
     #     with open(file_path, 'r') as file:
     #         sql = file.read()
-    #     return sql 
+    #     return sql
 
     # sql_query = read_sql_file('../queries/test_query.sql')
 
