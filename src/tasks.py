@@ -1,5 +1,7 @@
 import dlt
 import logging
+import os
+import pandas as pd
 from dlt.sources.helpers.rest_client import RESTClient
 from dlt.sources.helpers.rest_client.auth import BearerTokenAuth
 from datetime import datetime, timedelta
@@ -27,10 +29,10 @@ def fetch_data(start_time: datetime, end_time: datetime):
     logging.info(f"Fetching data from {start_time} to {end_time}")
     sensor_data = fetch_helper(start_time, end_time)
     for data in sensor_data:
-        yield {"sensor_id": data['tag_name'], "value": data['value'], "timestamp": data['timestamp']}
+        yield {"sensor_id": data['sensor_id'], "value": data['value'], "timestamp": data['timestamp']}
 
-
-@dlt.destination(batch_size=1000)
+# Send across full file from resource for processing
+@dlt.destination(batch_size=0)
 def post_data(data, schema):
     """
     Post data to the API endpoint.
@@ -45,16 +47,23 @@ def post_data(data, schema):
     headers = {
         "Content-Type": "application/json",
     }
-    grouped_data = group_data_by_sensor(data)
+    #grouped_data = group_data_by_sensor(data)
+    # print(data)
+    # client = RESTClient(
+    #     base_url=settings.api_base_url,
+    #     headers=headers,
+    #     auth=BearerTokenAuth(token=settings.post_data_api_key),
+    # )
 
-    client = RESTClient(
-        base_url=settings.api_base_url,
-        headers=headers,
-        auth=BearerTokenAuth(token=settings.post_data_api_key),
-    )
-
-    response = client.post(path=settings.api_post_endpoint, json=grouped_data)
-    response.raise_for_status()
+    # response = client.post(path=settings.api_post_endpoint, json=grouped_data)
+    # response.raise_for_status()
+    current_path = os.getcwd()
+    print(f'The current path of the saved file is: {current_path}')
+    df = pd.read_json(data)
+    #df = pd.DataFrame.from_dict(data)
+    print('Saving file')
+    df.to_csv(os.path.join(current_path, 'sensor_test.csv'), index=False)
+    print(df.head())
     return {"status": "success", "message": "Data posted successfully"}
 
 
@@ -77,13 +86,16 @@ def run_pipeline(self, start_time: datetime, end_time: datetime):
             destination=post_data,
             dataset_name="sensor_data",
         )
-
-        info = pipeline.run(fetch_data(start_time, end_time), loader_file_format="csv")
+        current_latest_run_time = get_latest_run_time()
+        if start_time < current_latest_run_time:
+            print(f'{start_time} is less than {current_latest_run_time}, data is already loaded in for an interval')
+            start_time = current_latest_run_time
+        print(f'Pipeline will run from {start_time} to {end_time}')
+        info = pipeline.run(fetch_data(start_time, end_time), loader_file_format="typed-jsonl", write_disposition="append")
         update_latest_run_time(end_time)
         return {
             "status": "success",
             "message": "Pipeline executed successfully",
-            "details": info.dict(),
         }
     except Exception as e:
         self.update_state(state="FAILURE", meta={"error": str(e)})
@@ -100,6 +112,7 @@ def scheduled_run_pipeline():
     """
     start_time = datetime.fromisoformat(get_latest_run_time())
     end_time = start_time + timedelta(minutes=settings.fetch_data_interval)
+    print(start_time, end_time)
     task = run_pipeline.delay(start_time, end_time)
 
     return {"task_id": task.id, "status": "Task scheduled"}

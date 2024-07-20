@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from src.auth import AuthBearer
 from src.models import RequestTimeRange, AsyncTaskResult
 from celery.result import AsyncResult
-from .tasks import fetch_data
+from .tasks import fetch_data, run_pipeline
 from .celery import celery as celery_app
 
 
@@ -12,7 +12,7 @@ app = FastAPI()
 @app.post("/raise-request", response_model=AsyncTaskResult)
 async def raise_request(time_range: RequestTimeRange, _: str = Depends(AuthBearer())):
     try:
-        task = fetch_data.delay(time_range.start_time, time_range.end_time)
+        task = run_pipeline.delay(time_range.start_time, time_range.end_time)
         return {"task_id": task.id, "status": "task submitted"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
