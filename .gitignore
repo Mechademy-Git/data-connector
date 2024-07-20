@@ -9,6 +9,7 @@
 /.venv
 /bower_components
 /venv
+/loads
 
 # Ignore build output
 /build

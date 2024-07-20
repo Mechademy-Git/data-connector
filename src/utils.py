@@ -8,6 +8,7 @@ from sqlalchemy import text
 from .query import construct_query
 import pandas as pd
 import os
+import json
 
 
 def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
@@ -16,28 +17,19 @@ def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
     For example, you might want to fetch data from a database or an external API
     """
 
-    # sql_query = construct_query()
+    sql_query = construct_query(start_time, end_time)
 
-    # with get_db() as session:
-    #     try:
-    #         result = session.execute(text(sql_query))
-    #         rows = result.fetchall()
-    #         column_names = result.keys()
-    #         df = pd.DataFrame(rows, column_names=column_names)
-    #         json_result = df.to_json(orient="records")
-    #         return json_result
-    #     except Exception as e:
-    #         print(f"An error occured: {e}")
-    sensor_data = [
-        {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"},
-        {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:30"},
-        {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:00"},
-        {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:30"},
-        {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:00"},
-        {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:30"},
-    ]
-    return sensor_data
-
+    with get_db() as session:
+        try:
+            result = session.execute(sql_query, {'start': start_time, 'end': end_time})
+            rows = result.fetchall()
+            column_names = result.keys()
+            df = pd.DataFrame(rows, columns=column_names)
+            print(df.head())
+            json_result = df.to_json(orient="records")
+            return json.loads(json_result)
+        except Exception as e:
+            print(f"An error occured: {e}")
 
 def get_latest_run_time() -> datetime:
     """

@@ -28,6 +28,7 @@ def fetch_data(start_time: datetime, end_time: datetime):
     """
     logging.info(f"Fetching data from {start_time} to {end_time}")
     sensor_data = fetch_helper(start_time, end_time)
+    print(sensor_data)
     for data in sensor_data:
         yield {"sensor_id": data['sensor_id'], "value": data['value'], "timestamp": data['timestamp']}
 

@@ -1,29 +1,23 @@
 import yaml
+from .db import get_db
+from sqlalchemy import text
+import os
 
-
-def construct_query(config_path="../fetch_query.yaml"):
+def construct_query(start_time, end_time) -> str:
     # Load configuration from YAML file
-    with open(config_path, "r") as file:
-        config = yaml.safe_load(file)
+    query_file_path = os.path.join(os.getcwd(), 'queries', 'sample_query.sql')
+    with open(query_file_path, 'r') as f:
+        query = f.read()
+    
+    # session = get_db()
+    # try:
+    #     sql_statement = text(query)
+    #     result = session.execute(sql_statement, {'start': start_time, 'end': end_time})
+    #     rows = result.fetchall()
 
-    tags = ",".join(config["tags"])
-    database_name = config["database"]["name"]
-    function_name = config["database"]["function"]
-    tag_name_field = config["fields"]["tag_name"]
-    timestamp_field = config["fields"]["timestamp"]
-    value_field = config["fields"]["value"]
+    #     for row in rows:
+    #         print(row)
+    # except Exception as e:
+    #     print(f"An error occured while executing the query: {e}")
 
-    # Parameterized SQL query
-    query = f"""
-    SELECT {tag_name_field} AS tag_name, {timestamp_field} AS timestamp, {value_field} AS value, quality AS ts_quality 
-    FROM {database_name}.dbo.{function_name}(
-        '{tags}', 
-        GETDATE() - 1, 
-        GETDATE(), 
-        1, 
-        ','
-    ) AS {function_name}_1 
-    WHERE quality = 192
-    """
-
-    return query
+    return text(query)
