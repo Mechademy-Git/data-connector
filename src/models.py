@@ -44,4 +44,3 @@ class SensorDataTable(Base):
     sensor_id = Column(Integer, index=True)
     value = Column(Float)
     timestamp = Column(DateTime)
-    

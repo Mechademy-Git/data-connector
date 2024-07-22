@@ -36,6 +36,7 @@ yarn.lock
 # Ignore sensitive or private information
 secrets.json
 credentials.txt
+.dlt/secrets.toml
 
 # Ignore backup files
 *.bak
@@ -54,3 +55,6 @@ __pycache__
 
 # DB Files
 *.sqlite3
+*.csv
+sensor_test.json
+/schemas/export

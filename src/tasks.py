@@ -11,8 +11,9 @@ from .utils import (
     fetch_helper,
     get_latest_run_time,
     update_latest_run_time,
-    group_data_by_sensor
+    group_data_by_sensor,
 )
+
 
 @dlt.resource()
 def fetch_data(start_time: datetime, end_time: datetime):
@@ -30,7 +31,12 @@ def fetch_data(start_time: datetime, end_time: datetime):
     sensor_data = fetch_helper(start_time, end_time)
     print(sensor_data)
     for data in sensor_data:
-        yield {"sensor_id": data['sensor_id'], "value": data['value'], "timestamp": data['timestamp']}
+        yield {
+            "sensor_id": data["sensor_id"],
+            "value": data["value"] if data["value"] is not None else 0.0,
+            "timestamp": data["timestamp"],
+        }
+
 
 # Send across full file from resource for processing
 @dlt.destination(batch_size=0)
@@ -48,23 +54,35 @@ def post_data(data, schema):
     headers = {
         "Content-Type": "application/json",
     }
-    #grouped_data = group_data_by_sensor(data)
-    # print(data)
-    # client = RESTClient(
-    #     base_url=settings.api_base_url,
-    #     headers=headers,
-    #     auth=BearerTokenAuth(token=settings.post_data_api_key),
-    # )
+    grouped_data = group_data_by_sensor(data)
+    print(data)
 
-    # response = client.post(path=settings.api_post_endpoint, json=grouped_data)
-    # response.raise_for_status()
-    current_path = os.getcwd()
-    print(f'The current path of the saved file is: {current_path}')
+    client = RESTClient(
+        base_url=settings.api_base_url,
+        headers=headers,
+        auth=BearerTokenAuth(token=settings.post_data_api_key),
+    )
+
+    response = client.post(path=settings.api_post_endpoint, json=grouped_data)
+    response.raise_for_status()
+
+    return {"status": "success", "message": "Data posted successfully"}
+
+
+@dlt.destination(batch_size=0)
+def load_data(data, schema):
+    """
+    Function to load data locally for validation.
+    """
+    # Read full batch into DataFrame
     df = pd.read_json(data)
-    #df = pd.DataFrame.from_dict(data)
-    print('Saving file')
-    df.to_csv(os.path.join(current_path, 'sensor_test.csv'), index=False)
-    print(df.head())
+    logging.info(f"Data received from fetch function loaded in {data}")
+
+    # Save file in CWD
+    df.to_json(os.path.join(os.getcwd(), "sensor_test.json"), index=False)
+    logging.info(f"Loaded sample file into CWD")
+
+    # Return success
     return {"status": "success", "message": "Data posted successfully"}
 
 
@@ -81,19 +99,34 @@ def run_pipeline(self, start_time: datetime, end_time: datetime):
     Returns:
         dict: Status and details of the pipeline execution.
     """
+
     try:
         pipeline = dlt.pipeline(
             pipeline_name="sensor_data_pipeline",
             destination=post_data,
             dataset_name="sensor_data",
+            export_schema_path="schemas/export",
+            import_schema_path="schemas/import",
         )
+
         current_latest_run_time = get_latest_run_time()
+
         if start_time < current_latest_run_time:
-            print(f'{start_time} is less than {current_latest_run_time}, data is already loaded in for an interval')
+            print(
+                f"{start_time} is less than {current_latest_run_time}, data is already loaded in for an interval"
+            )
             start_time = current_latest_run_time
-        print(f'Pipeline will run from {start_time} to {end_time}')
-        info = pipeline.run(fetch_data(start_time, end_time), loader_file_format="typed-jsonl", write_disposition="append")
+
+        info = pipeline.run(
+            fetch_data(start_time, end_time),
+            destination="filesystem",
+            loader_file_format="csv",
+            write_disposition="append",
+        )
+        logging.info(f"Pipeline run complete: {info}")
+
         update_latest_run_time(end_time)
+
         return {
             "status": "success",
             "message": "Pipeline executed successfully",
@@ -113,7 +146,6 @@ def scheduled_run_pipeline():
     """
     start_time = datetime.fromisoformat(get_latest_run_time())
     end_time = start_time + timedelta(minutes=settings.fetch_data_interval)
-    print(start_time, end_time)
     task = run_pipeline.delay(start_time, end_time)
 
     return {"task_id": task.id, "status": "Task scheduled"}

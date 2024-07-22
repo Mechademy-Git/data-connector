@@ -1,2 +1,5 @@
 [normalize.data_writer]
 disable_compression=true
+
+[runtime]
+dlthub_telemetry = true

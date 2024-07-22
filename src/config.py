@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 import os
 
+
 class Settings(BaseSettings):
     celery_broker_url: str = "redis://localhost:6379/0"
     celery_result_backend: str = "redis://localhost:6379/0"
@@ -12,6 +13,8 @@ class Settings(BaseSettings):
     post_data_api_key: str = "turbomechanica_api_key"
     fetch_data_interval: int = 30  # minutes
     batch_size: int = 30  # minutes
+    query_folder: str = "queries"
+    query_name: str = "sample_query.sql"
 
     class Config:
         env_file = ".env"
