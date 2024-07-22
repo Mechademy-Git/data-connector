@@ -1,48 +1,151 @@
-import requests
+import dlt
 import logging
+import os
+import pandas as pd
+from dlt.sources.helpers.rest_client import RESTClient
+from dlt.sources.helpers.rest_client.auth import BearerTokenAuth
 from datetime import datetime, timedelta
 from .celery import celery as app
 from .config import settings
 from .utils import (
     fetch_helper,
-    group_data_by_sensor,
     get_latest_run_time,
     update_latest_run_time,
+    group_data_by_sensor,
 )
 
 
-@app.task
+@dlt.resource()
 def fetch_data(start_time: datetime, end_time: datetime):
+    """
+    Fetch sensor data for the given time range.
+
+    Args:
+        start_time (datetime): Start of the time range.
+        end_time (datetime): End of the time range.
+
+    Yields:
+        dict: Sensor data entries.
+    """
     logging.info(f"Fetching data from {start_time} to {end_time}")
     sensor_data = fetch_helper(start_time, end_time)
-    task = post_data.delay(start_time, end_time, sensor_data)
-    return {"task_id": task.id, "status": "success"}
+    print(sensor_data)
+    for data in sensor_data:
+        yield {
+            "sensor_id": data["sensor_id"],
+            "value": data["value"] if data["value"] is not None else 0.0,
+            "timestamp": data["timestamp"],
+        }
 
 
-@app.task
-def scheduled_fetch_data():
-    start_time = datetime.fromisoformat(get_latest_run_time())
-    end_time = start_time + timedelta(minutes=settings.fetch_data_interval)
-    fetch_data.delay(start_time, end_time)
-    update_latest_run_time(end_time)
-    return {"status": "success", "message": "Task scheduled"}
+# Send across full file from resource for processing
+@dlt.destination(batch_size=0)
+def post_data(data, schema):
+    """
+    Post data to the API endpoint.
 
+    Args:
+        data (dict): Data to be posted.
+        schema (dict): Schema of the data.
 
-@app.task
-def post_data(start_time: datetime, end_time: datetime, sensor_data):
-    endpoint = settings.post_data_endpoint
+    Returns:
+        dict: Status of the post operation.
+    """
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {settings.post_data_api_key}",
     }
+    grouped_data = group_data_by_sensor(data)
+    print(data)
 
-    # Apply data transformation here if needed
-    grouped_data = group_data_by_sensor(sensor_data)
-    payload = {
-        "start_time": start_time.isoformat(),
-        "end_time": end_time.isoformat(),
-        "data": grouped_data,
-    }
-    response = requests.post(endpoint, json=payload, headers=headers)
+    client = RESTClient(
+        base_url=settings.api_base_url,
+        headers=headers,
+        auth=BearerTokenAuth(token=settings.post_data_api_key),
+    )
+
+    response = client.post(path=settings.api_post_endpoint, json=grouped_data)
     response.raise_for_status()
+
     return {"status": "success", "message": "Data posted successfully"}
+
+
+@dlt.destination(batch_size=0)
+def load_data(data, schema):
+    """
+    Function to load data locally for validation.
+    """
+    # Read full batch into DataFrame
+    df = pd.read_json(data)
+    logging.info(f"Data received from fetch function loaded in {data}")
+
+    # Save file in CWD
+    df.to_json(os.path.join(os.getcwd(), "sensor_test.json"), index=False)
+    logging.info(f"Loaded sample file into CWD")
+
+    # Return success
+    return {"status": "success", "message": "Data posted successfully"}
+
+
+@app.task(bind=True)
+def run_pipeline(self, start_time: datetime, end_time: datetime):
+    """
+    Run the data pipeline to fetch and post data.
+
+    Args:
+        self: Task instance (provided by Celery).
+        start_time (datetime): Start of the time range.
+        end_time (datetime): End of the time range.
+
+    Returns:
+        dict: Status and details of the pipeline execution.
+    """
+
+    try:
+        pipeline = dlt.pipeline(
+            pipeline_name="sensor_data_pipeline",
+            destination=post_data,
+            dataset_name="sensor_data",
+            export_schema_path="schemas/export",
+            import_schema_path="schemas/import",
+        )
+
+        current_latest_run_time = get_latest_run_time()
+
+        if start_time < current_latest_run_time:
+            print(
+                f"{start_time} is less than {current_latest_run_time}, data is already loaded in for an interval"
+            )
+            start_time = current_latest_run_time
+
+        info = pipeline.run(
+            fetch_data(start_time, end_time),
+            destination="filesystem",
+            loader_file_format="csv",
+            write_disposition="append",
+        )
+        logging.info(f"Pipeline run complete: {info}")
+
+        update_latest_run_time(end_time)
+
+        return {
+            "status": "success",
+            "message": "Pipeline executed successfully",
+        }
+    except Exception as e:
+        self.update_state(state="FAILURE", meta={"error": str(e)})
+        raise
+
+
+@app.task
+def scheduled_run_pipeline():
+    """
+    Scheduled task to run the pipeline for the next time interval.
+
+    Returns:
+        dict: Task ID and status of the scheduled run.
+    """
+    start_time = datetime.fromisoformat(get_latest_run_time())
+    end_time = start_time + timedelta(minutes=settings.fetch_data_interval)
+    task = run_pipeline.delay(start_time, end_time)
+
+    return {"task_id": task.id, "status": "Task scheduled"}

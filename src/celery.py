@@ -9,7 +9,7 @@ celery = Celery(
 
 celery.conf.beat_schedule = {
     "fetch-data-schedule": {
-        "task": "src.tasks.scheduled_fetch_data",
+        "task": "src.tasks.scheduled_run_pipeline",
         "schedule": crontab(minute=f"*/{settings.fetch_data_interval}"),
     },
 }

@@ -4,6 +4,11 @@ from typing import List
 from .db import get_db
 from .models import SensorDataTable, SensorData
 from .schemas import SensorDataSchema
+from sqlalchemy import text
+from .query import execute_query
+import pandas as pd
+import os
+import json
 
 
 def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
@@ -11,26 +16,9 @@ def fetch_helper(start_time: datetime, end_time: datetime) -> List[SensorData]:
     Implement the logic to fetch data based on start_time and end_time
     For example, you might want to fetch data from a database or an external API
     """
+    data = execute_query(start_time=start_time, end_time=end_time)
 
-    # Example 1: Fetch data from a database
-    # with get_db() as db:
-    #     sensor_data = db.query(SensorDataTable).filter(
-    #         SensorDataTable.timestamp >= start_time,
-    #         SensorDataTable.timestamp <= end_time
-    #     ).all()
-    #     sensor_data = [SensorDataSchema.model_validate(data).model_dump() for data in sensor_data]
-    #     return sensor_data
-
-    # Remove hard-coded data below after implementing the logic to fetch data
-    sensor_data = [
-        {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:00"},
-        {"sensor_id": "sensor_1", "value": 10, "timestamp": "2021-07-01T12:00:30"},
-        {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:00"},
-        {"sensor_id": "sensor_2", "value": 20, "timestamp": "2021-07-01T12:01:30"},
-        {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:00"},
-        {"sensor_id": "sensor_3", "value": 30, "timestamp": "2021-07-01T12:02:30"},
-    ]
-    return sensor_data
+    return data
 
 
 def get_latest_run_time() -> datetime:
@@ -38,16 +26,59 @@ def get_latest_run_time() -> datetime:
     Implement the logic to get scheduler's last run time
     For example, you might want to fetch the last ran time from a database
     """
+    try:
+        # Get the current working directory
+        current_dir = os.getcwd()
 
-    # Example 1: Fetch the last ran time from a database
-    # db = get_db()
-    # last_ran_time = db.query(LastRanTimeTable).first()
+        # Define the target directory
+        target_dir = os.path.join(current_dir, "loads")
 
-    # return last_ran_time
+        # Ensure the target directory exists
+        if not os.path.exists(target_dir):
+            print(f"The directory '{target_dir}' does not exist.")
+            return datetime.strptime("1970-01-01_00-00-00", "%Y-%m-%d_%H-%M-%S")
 
-    # Remove hard-coded data below after implementing the logic to fetch the last ran time
-    last_ran_time = "2021-07-01T12:00:00"
-    return last_ran_time
+        # List all files in the target directory
+        files = os.listdir(target_dir)
+
+        # Filter out files that don't match the pattern 'run_{timestamp}.DONE'
+        run_files = [f for f in files if f.startswith("run_") and f.endswith(".DONE")]
+
+        if not run_files:
+            print("No valid run files found in the directory.")
+            return datetime.strptime("1970-01-01_00-00-00", "%Y-%m-%d_%H-%M-%S")
+
+        # Extract timestamps and convert them to datetime objects
+        timestamps = []
+        for file in run_files:
+            timestamp_str = file[
+                4:-5
+            ]  # Extract the part after 'run_' and before '.DONE'
+            try:
+                timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d_%H-%M-%S")
+                timestamps.append(timestamp)
+            except ValueError:
+                print(f"Skipping file with invalid timestamp format: {file}")
+
+        if not timestamps:
+            print("No valid timestamps found in the run files.")
+            return datetime.strptime("1970-01-01_00-00-00", "%Y-%m-%d_%H-%M-%S")
+
+        # Get the most recent timestamp
+        latest_timestamp = max(timestamps)
+        return latest_timestamp
+
+    except Exception as e:
+        print(f"Error fetching the latest run time: {e}")
+        return datetime.strptime("1970-01-01_00-00-00", "%Y-%m-%d_%H-%M-%S")
+
+    except Exception as e:
+        print(f"Error fetching the latest run time: {e}")
+        return datetime.strptime("1970-01-01_00-00-00", "%Y-%m-%d_%H-%M-%S")
+
+    except Exception as e:
+        print(f"Error fetching the latest run time: {e}")
+        return datetime.strptime("1970-01-01_00-00-00", "%Y-%m-%d_%H-%M-%S")
 
 
 def update_latest_run_time(timestamp: datetime):
@@ -55,15 +86,33 @@ def update_latest_run_time(timestamp: datetime):
     Implement the logic to update scheduler's last run time
     For example, you might want to update the last ran time in a database
     """
+    try:
+        # Convert the timestamp to the desired format
+        formatted_timestamp = timestamp.strftime("%Y-%m-%d_%H-%M-%S")
 
-    # Example 1: Update the last ran time in a database
-    # db = get_db()
-    # last_ran_time = db.query(LastRanTimeTable).first()
-    # last_ran_time.timestamp = datetime.now()
-    # db.commit()
+        # Get the current working directory
+        current_dir = os.getcwd()
 
-    # Remove hard-coded data below after implementing the logic to update the last ran time
-    pass
+        # Define the target directory
+        target_dir = os.path.join(current_dir, "loads")
+
+        # Ensure the target directory exists
+        os.makedirs(target_dir, exist_ok=True)
+
+        # Create the filename
+        filename = f"run_{formatted_timestamp}.DONE"
+
+        # Create the full file path
+        file_path = os.path.join(target_dir, filename)
+
+        # Create the file
+        with open(file_path, "w") as file:
+            pass
+
+        print(f"File '{filename}' created successfully in '{target_dir}'")
+
+    except Exception as e:
+        print(f"Error creating file: {e}")
 
 
 def group_data_by_sensor(data: List[SensorData]):

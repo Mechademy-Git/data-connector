@@ -6,7 +6,7 @@ authors = ["Rajdeep Sharma"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "3.9.13"
 celery = {extras = ["redis"], version = "^5.2.0"}
 fastapi = "^0.111.0"
 uvicorn = "^0.29.0"
@@ -15,6 +15,8 @@ sqlalchemy = "^2.0.30"
 psycopg2-binary = "^2.9.9"
 requests = "^2.32.2"
 databases = "^0.9.0"
+dlt = "^0.5.1"
+pandas = "^2.2.2"
 
 
 [tool.poetry.group.dev.dependencies]
